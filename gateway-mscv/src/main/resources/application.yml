@@ -1,0 +1,215 @@
+spring:
+  config:
+    import: optional:file:./.env[.properties]
+  application:
+    name: gamehub-gateway
+  cloud:
+    gateway:
+      routes:
+        # Rutas de API
+        - id: auth-service
+          uri: lb://authentificator-mscv
+          predicates:
+            - Path=/api/v1/auth/**,/api/v1/cuentas/**
+
+        - id: user-service
+          uri: lb://user-mscv
+          predicates:
+            - Path=/api/v1/users/**,/api/v1/direcciones/**
+
+        - id: product-service
+          uri: lb://product-mscv
+          predicates:
+            - Path=/api/v1/products/**
+
+        - id: category-service
+          uri: lb://category-mscv
+          predicates:
+            - Path=/api/v1/categories/**
+
+        - id: inventory-service
+          uri: lb://inventory-mscv
+          predicates:
+            - Path=/api/v1/inventories/**
+
+        - id: order-service
+          uri: lb://order-mscv
+          predicates:
+            - Path=/api/v1/orders/**
+
+        - id: payment-service
+          uri: lb://payment-mscv
+          predicates:
+            - Path=/api/v1/payments/**
+
+        - id: shipping-service
+          uri: lb://shipping-mscv
+          predicates:
+            - Path=/api/v1/shippings/**
+
+        - id: promotion-service
+          uri: lb://promotion-mscv
+          predicates:
+            - Path=/api/v1/promotions/**
+
+        - id: review-service
+          uri: lb://review-mscv
+          predicates:
+            - Path=/api/v1/reviews/**
+
+        - id: warranty-service
+          uri: lb://warranty-mscv
+          predicates:
+            - Path=/api/v1/warranties/**
+
+        - id: notification-service
+          uri: lb://notification-mscv
+          predicates:
+            - Path=/api/v1/notifications/**
+
+        # Documentación OpenAPI de cada servicio, servida por el Gateway
+        - id: auth-api-docs
+          uri: lb://authentificator-mscv
+          predicates:
+            - Path=/api-docs/auth
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: users-api-docs
+          uri: lb://user-mscv
+          predicates:
+            - Path=/api-docs/users
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: products-api-docs
+          uri: lb://product-mscv
+          predicates:
+            - Path=/api-docs/products
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: categories-api-docs
+          uri: lb://category-mscv
+          predicates:
+            - Path=/api-docs/categories
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: inventory-api-docs
+          uri: lb://inventory-mscv
+          predicates:
+            - Path=/api-docs/inventory
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: orders-api-docs
+          uri: lb://order-mscv
+          predicates:
+            - Path=/api-docs/orders
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: payments-api-docs
+          uri: lb://payment-mscv
+          predicates:
+            - Path=/api-docs/payments
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: shipping-api-docs
+          uri: lb://shipping-mscv
+          predicates:
+            - Path=/api-docs/shipping
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: promotions-api-docs
+          uri: lb://promotion-mscv
+          predicates:
+            - Path=/api-docs/promotions
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: reviews-api-docs
+          uri: lb://review-mscv
+          predicates:
+            - Path=/api-docs/reviews
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: warranties-api-docs
+          uri: lb://warranty-mscv
+          predicates:
+            - Path=/api-docs/warranties
+          filters:
+            - SetPath=/v3/api-docs
+
+        - id: notifications-api-docs
+          uri: lb://notification-mscv
+          predicates:
+            - Path=/api-docs/notifications
+          filters:
+            - SetPath=/v3/api-docs
+
+      discovery:
+        locator:
+          enabled: false
+
+server:
+  port: ${SERVER_PORT:8091}
+  forward-headers-strategy: framework
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+
+springdoc:
+  api-docs:
+    enabled: true
+
+  swagger-ui:
+    enabled: true
+    path: /docs/swagger-ui.html
+    use-root-path: true
+
+    urls:
+      - name: Autenticación
+        url: /api-docs/auth
+
+      - name: Usuarios
+        url: /api-docs/users
+
+      - name: Productos
+        url: /api-docs/products
+
+      - name: Categorías
+        url: /api-docs/categories
+
+      - name: Inventario
+        url: /api-docs/inventory
+
+      - name: Órdenes
+        url: /api-docs/orders
+
+      - name: Pagos
+        url: /api-docs/payments
+
+      - name: Despachos
+        url: /api-docs/shipping
+
+      - name: Promociones
+        url: /api-docs/promotions
+
+      - name: Reseñas
+        url: /api-docs/reviews
+
+      - name: Garantías
+        url: /api-docs/warranties
+
+      - name: Notificaciones
+        url: /api-docs/notifications
+
+jwt:
+  secret: ${JWT_SECRET}}

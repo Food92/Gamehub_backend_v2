@@ -1,0 +1,7 @@
+package com.gamehubstore.warranty_mscv.controllers;
+import com.gamehubstore.warranty_mscv.exceptions.WarrantyException; import feign.FeignException; import org.slf4j.*; import org.springframework.http.*; import org.springframework.validation.FieldError; import org.springframework.web.bind.MethodArgumentNotValidException; import org.springframework.web.bind.annotation.*; import java.util.*;
+@RestControllerAdvice public class GlobalExceptionHandler {private static final Logger log=LoggerFactory.getLogger(GlobalExceptionHandler.class);
+ @ExceptionHandler(MethodArgumentNotValidException.class) public ResponseEntity<Map<String,Object>> validation(MethodArgumentNotValidException ex){Map<String,String> fields=new LinkedHashMap<>();for(FieldError e:ex.getBindingResult().getFieldErrors())fields.put(e.getField(),e.getDefaultMessage());log.warn("Validación de garantía fallida: {}",fields);return ResponseEntity.badRequest().body(Map.of("error","Solicitud inválida","fields",fields));}
+ @ExceptionHandler(WarrantyException.class) public ResponseEntity<Map<String,String>> business(WarrantyException ex){log.warn("Regla de garantía: {}",ex.getMessage());return ResponseEntity.unprocessableEntity().body(Map.of("error",ex.getMessage()));}
+ @ExceptionHandler(FeignException.class) public ResponseEntity<Map<String,String>> dependency(FeignException ex){log.error("Dependencia remota de garantía no disponible: status={}",ex.status());return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(Map.of("error","No fue posible validar la compra"));}
+}

@@ -1,0 +1,1 @@
+package com.gamehubstore.notification_mscv.repositories; import com.gamehubstore.notification_mscv.models.Notification; import org.springframework.data.jpa.repository.JpaRepository; import java.util.*; public interface NotificationRepository extends JpaRepository<Notification,Long> { List<Notification> findByUserIdAndArchivedFalse(Long userId); }

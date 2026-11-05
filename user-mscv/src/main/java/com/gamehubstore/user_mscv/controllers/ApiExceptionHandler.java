@@ -1,0 +1,6 @@
+package com.gamehubstore.user_mscv.controllers;
+import com.gamehubstore.user_mscv.exceptions.UserException; import org.slf4j.*; import org.springframework.http.*; import org.springframework.validation.FieldError; import org.springframework.web.bind.MethodArgumentNotValidException; import org.springframework.web.bind.annotation.*; import java.util.*;
+@RestControllerAdvice public class ApiExceptionHandler {private static final Logger log=LoggerFactory.getLogger(ApiExceptionHandler.class);
+ @ExceptionHandler(MethodArgumentNotValidException.class) public ResponseEntity<Map<String,Object>> validation(MethodArgumentNotValidException ex){Map<String,String> fields=new LinkedHashMap<>();for(FieldError e:ex.getBindingResult().getFieldErrors())fields.put(e.getField(),e.getDefaultMessage());log.warn("Validación de usuario fallida: {}",fields);return ResponseEntity.badRequest().body(Map.of("error","Solicitud inválida","fields",fields));}
+ @ExceptionHandler(UserException.class) public ResponseEntity<Map<String,String>> user(UserException ex){log.warn("Regla de usuario: {}",ex.getMessage());HttpStatus status=ex.getMessage().contains("no encontrado")?HttpStatus.NOT_FOUND:HttpStatus.CONFLICT;return ResponseEntity.status(status).body(Map.of("error",ex.getMessage()));}
+}

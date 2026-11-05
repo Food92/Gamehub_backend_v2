@@ -1,0 +1,6 @@
+package com.gamehubstore.authentificator_mscv.controllers;
+import org.slf4j.*; import org.springframework.http.*; import org.springframework.validation.FieldError; import org.springframework.web.bind.MethodArgumentNotValidException; import org.springframework.web.bind.annotation.*; import org.springframework.web.server.ResponseStatusException; import java.util.*;
+@RestControllerAdvice public class ApiExceptionHandler { private static final Logger log=LoggerFactory.getLogger(ApiExceptionHandler.class);
+ @ExceptionHandler(MethodArgumentNotValidException.class) public ResponseEntity<Map<String,Object>> validation(MethodArgumentNotValidException ex){Map<String,String> fields=new LinkedHashMap<>(); for(FieldError e:ex.getBindingResult().getFieldErrors())fields.put(e.getField(),e.getDefaultMessage()); log.warn("Validación de entrada fallida: {}",fields);return ResponseEntity.badRequest().body(Map.of("error","Solicitud inválida","fields",fields));}
+ @ExceptionHandler(ResponseStatusException.class) public ResponseEntity<Map<String,String>> status(ResponseStatusException ex){log.warn("Solicitud de autenticación rechazada: {}",ex.getReason());return ResponseEntity.status(ex.getStatusCode()).body(Map.of("error",Objects.toString(ex.getReason(),"Solicitud rechazada")));}
+}

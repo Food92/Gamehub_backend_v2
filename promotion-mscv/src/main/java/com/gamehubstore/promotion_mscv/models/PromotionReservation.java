@@ -1,0 +1,5 @@
+package com.gamehubstore.promotion_mscv.models;
+import jakarta.persistence.*; import java.math.BigDecimal; import java.time.LocalDateTime;
+@Entity @Table(name="promotion_reservations", uniqueConstraints=@UniqueConstraint(name="uk_promotion_reservation_order",columnNames="order_id"))
+public class PromotionReservation { @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id; @Column(name="order_id",nullable=false) private Long orderId; @Column(nullable=false) private String code; @Column(nullable=false) private BigDecimal discount; @Column(nullable=false) private String status; @Column(nullable=false) private LocalDateTime updatedAt=LocalDateTime.now();
+ public Long getId(){return id;} public Long getOrderId(){return orderId;} public void setOrderId(Long v){orderId=v;} public String getCode(){return code;} public void setCode(String v){code=v;} public BigDecimal getDiscount(){return discount;} public void setDiscount(BigDecimal v){discount=v;} public String getStatus(){return status;} public void setStatus(String v){status=v;} public LocalDateTime getUpdatedAt(){return updatedAt;} public void setUpdatedAt(LocalDateTime v){updatedAt=v;}}

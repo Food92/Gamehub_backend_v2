@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/authentificator-mscv/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/category-mscv/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka-mscv/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-mscv/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/inventory-mscv/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/notification-mscv/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/order-mscv/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/payment-mscv/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/product-mscv/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/promotion-mscv/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/review-mscv/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/shipping-mscv/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/user-mscv/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/warranty-mscv/src/main/java" charset="UTF-8" />
+  </component>
+</project>

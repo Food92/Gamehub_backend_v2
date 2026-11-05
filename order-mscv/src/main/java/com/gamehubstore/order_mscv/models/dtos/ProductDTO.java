@@ -1,0 +1,2 @@
+package com.gamehubstore.order_mscv.models.dtos;
+public class ProductDTO { private Long idProduct; private Double precio; private Boolean estado; public Long getIdProduct(){return idProduct;} public void setIdProduct(Long v){idProduct=v;} public Double getPrecio(){return precio;} public void setPrecio(Double v){precio=v;} public Boolean getEstado(){return estado;} public void setEstado(Boolean v){estado=v;} }

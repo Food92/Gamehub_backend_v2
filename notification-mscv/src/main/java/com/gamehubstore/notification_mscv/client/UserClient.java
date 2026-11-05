@@ -1,0 +1,1 @@
+package com.gamehubstore.notification_mscv.client; import org.springframework.cloud.openfeign.FeignClient; import org.springframework.web.bind.annotation.*; import java.util.Map; @FeignClient(name="user-mscv",url="${clients.user.url:http://localhost:8002}") public interface UserClient { @GetMapping("/api/v1/users/{id}") Map<String,Object> findUser(@PathVariable("id") Long id); }

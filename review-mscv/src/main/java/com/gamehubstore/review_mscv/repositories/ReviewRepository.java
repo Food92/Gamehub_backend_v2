@@ -1,0 +1,2 @@
+package com.gamehubstore.review_mscv.repositories; import com.gamehubstore.review_mscv.models.Review; import org.springframework.data.jpa.repository.JpaRepository; import java.util.*;
+public interface ReviewRepository extends JpaRepository<Review,Long> { List<Review> findByProductIdAndActiveTrue(Long productId); List<Review> findByUserId(Long userId); boolean existsByUserIdAndOrderIdAndProductId(Long userId,Long orderId,Long productId); }
