@@ -2,11 +2,13 @@ package com.gamehubstore.payment_mscv.services;
 
 import com.gamehubstore.payment_mscv.models.Payment;
 import com.gamehubstore.payment_mscv.models.dtos.PaymentDTO;
+import com.gamehubstore.payment_mscv.models.dtos.SimularPagoRequest;
 
 import java.util.List;
 
 public interface PaymentService {
     PaymentDTO save(PaymentDTO paymentDTO); // Retorna PaymentDTO para el Controller
+    PaymentDTO simularPago(SimularPagoRequest request);
     List<Payment> findByOrder(Long orderId);
     List<Payment> findByEstadoPago(String estadoPago);
     List<Payment> findByTipoPago(String tipoPago);

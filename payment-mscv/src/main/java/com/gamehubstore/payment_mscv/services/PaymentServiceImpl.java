@@ -8,6 +8,7 @@ import com.gamehubstore.payment_mscv.exceptions.PaymentException;
 import com.gamehubstore.payment_mscv.models.Payment;
 import com.gamehubstore.payment_mscv.models.dtos.OrderClientDTO; // 👈 Cambiado aquí
 import com.gamehubstore.payment_mscv.models.dtos.PaymentDTO;
+import com.gamehubstore.payment_mscv.models.dtos.SimularPagoRequest;
 import com.gamehubstore.payment_mscv.repositories.PaymentRepository;
 import com.gamehubstore.payment_mscv.services.PaymentService;
 import feign.FeignException;
@@ -47,27 +48,41 @@ public class PaymentServiceImpl implements PaymentService {
             throw new PaymentException("Order no existe");
         }
 
-        // 2. Validar monto
-        if (!order.getTotal().equals(paymentDTO.getMonto())) {
-            throw new PaymentException("El monto no coincide con el total de la orden");
+        // 2. Validar estado y monto de la orden
+        if ("PAGADA".equalsIgnoreCase(order.getEstado())) {
+            throw new PaymentException("La orden #" + paymentDTO.getOrderId() + " ya se encuentra PAGADA");
+        }
+        if ("CANCELADA".equalsIgnoreCase(order.getEstado()) || "RECHAZADA".equalsIgnoreCase(order.getEstado())) {
+            throw new PaymentException("La orden #" + paymentDTO.getOrderId() + " está " + order.getEstado() + " y no admite pagos");
+        }
+        if (order.getTotal() == null || paymentDTO.getMonto() == null
+                || Math.abs(order.getTotal() - paymentDTO.getMonto()) > 0.01) {
+            throw new PaymentException("El monto no coincide con el total de la orden (" + order.getTotal() + ")");
         }
 
         // 3. Evitar duplicados (Corregido a PaymentException)
         boolean yaExistePagoAprobado = paymentRepository.findByOrderId(paymentDTO.getOrderId())
                 .stream()
-                .anyMatch(p -> "APROBADO".equals(p.getEstadoPago()));
+                .anyMatch(p -> "APROBADO".equalsIgnoreCase(p.getEstadoPago()));
 
         if (yaExistePagoAprobado) {
             throw new PaymentException("Ya existe un pago aprobado para esta orden");
         }
 
+        String estadoNormalizado = (paymentDTO.getEstadoPago() == null || paymentDTO.getEstadoPago().isBlank())
+                ? "APROBADO"
+                : paymentDTO.getEstadoPago().trim().toUpperCase();
+        String tipoNormalizado = (paymentDTO.getTipoPago() == null || paymentDTO.getTipoPago().isBlank())
+                ? "TARJETA_CREDITO"
+                : paymentDTO.getTipoPago().trim().toUpperCase();
+
         // 4. Crear pago (Entidad)
         Payment payment = new Payment();
         payment.setOrderId(paymentDTO.getOrderId());
-        payment.setMonto(paymentDTO.getMonto());
-        payment.setTipoPago(paymentDTO.getTipoPago());
-        payment.setEstadoPago(paymentDTO.getEstadoPago());
-        payment.setCodigoPago(UUID.randomUUID().toString());
+        payment.setMonto(order.getTotal());
+        payment.setTipoPago(tipoNormalizado);
+        payment.setEstadoPago(estadoNormalizado);
+        payment.setCodigoPago("PAY-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         payment.setFechaPago(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
         Payment guardado = paymentRepository.save(payment);
@@ -89,6 +104,32 @@ public class PaymentServiceImpl implements PaymentService {
         resultadoDTO.setFechaPago(guardado.getFechaPago());
 
         return resultadoDTO;
+    }
+
+    @Override
+    @Transactional
+    public PaymentDTO simularPago(SimularPagoRequest request) {
+        if (request == null || request.getOrderId() == null) {
+            throw new PaymentException("El ID de la orden (orderId) es obligatorio");
+        }
+        OrderClientDTO order;
+        try {
+            order = orderClient.getOrderById(request.getOrderId());
+            if (order == null) {
+                throw new PaymentException("Order no existe");
+            }
+        } catch (FeignException.NotFound e) {
+            throw new PaymentException("Order no existe");
+        }
+
+        PaymentDTO dto = new PaymentDTO();
+        dto.setOrderId(request.getOrderId());
+        dto.setMonto(request.getMonto() != null ? request.getMonto() : order.getTotal());
+        dto.setTipoPago(request.getTipoPago() != null && !request.getTipoPago().isBlank()
+                ? request.getTipoPago().trim().toUpperCase()
+                : "TARJETA_CREDITO");
+        dto.setEstadoPago(request.isSimularRechazo() ? "RECHAZADO" : "APROBADO");
+        return save(dto);
     }
 
     @Override

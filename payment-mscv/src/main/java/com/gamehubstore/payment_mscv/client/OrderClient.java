@@ -4,7 +4,7 @@ import com.gamehubstore.payment_mscv.models.dtos.OrderClientDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 // "order-mscv" debe coincidir con el 'spring.application.name' del microservicio de órdenes.
@@ -20,10 +20,10 @@ public interface OrderClient {
     OrderClientDTO getOrderById(@PathVariable("orderId") Long orderId);
 
     /**
-     * Se comunica con el PatchMapping del OrderController del vendedor/sistema.
-     * Cambia el estado de la orden (por ejemplo, a 'PAGADA' o 'RECHAZADA') según el resultado de la transacción.
+     * Se comunica con el endpoint de cambio de estado del OrderController.
+     * Usa PUT para compatibilidad nativa con el cliente HTTP estándar de OpenFeign/JDK.
      */
-    @PatchMapping("/{orderId}/estado")
+    @PutMapping("/{orderId}/estado")
     OrderClientDTO updateEstado(
             @PathVariable("orderId") Long orderId,
             @RequestParam("estado") String estado

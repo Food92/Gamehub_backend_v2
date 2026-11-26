@@ -43,8 +43,11 @@ public class OrderServiceImpl implements OrderService {
         List<DetailOrder> details = request.getDetails().stream().map(line -> {
             var product = productClient.findById(line.getIdProduct());
             if (product == null || !Boolean.TRUE.equals(product.getEstado())) throw new OrderException("Producto inexistente o inactivo: " + line.getIdProduct());
+            double unitPrice = (Boolean.TRUE.equals(product.getEnOferta()) && product.getPrecioOferta() != null && product.getPrecioOferta() > 0)
+                    ? product.getPrecioOferta()
+                    : product.getPrecio();
             DetailOrder detail = new DetailOrder(); detail.setIdProducto(line.getIdProduct()); detail.setCantidad(Math.toIntExact(line.getCantidad()));
-            detail.setPrecioUnitario(product.getPrecio()); detail.setPrecioTotal(product.getPrecio() * detail.getCantidad()); return detail;
+            detail.setPrecioUnitario(unitPrice); detail.setPrecioTotal(unitPrice * detail.getCantidad()); return detail;
         }).toList();
         double subtotal=details.stream().mapToDouble(DetailOrder::getPrecioTotal).sum();
         String code=request.getPromotionCode()==null||request.getPromotionCode().isBlank()?null:request.getPromotionCode().trim();
@@ -127,7 +130,9 @@ public class OrderServiceImpl implements OrderService {
             order.setEstado(CONFIRMACION_PENDIENTE);order.setSagaUpdatedAt(LocalDateTime.now());orderRepository.saveAndFlush(order);
             try {
                 for(DetailOrder detail:order.getDetails())inventoryClient.confirmar(order.getOrderId(),detail.getIdProducto());
-                promotionClient.confirm(order.getOrderId());
+                if (order.getPromotionCode() != null && !order.getPromotionCode().isBlank()) {
+                    promotionClient.confirm(order.getOrderId());
+                }
                 order.setEstado("PAGADA");order.setCompensationTarget(null);order.setSagaUpdatedAt(LocalDateTime.now());Order saved=orderRepository.saveAndFlush(order);if(firestoreSyncService!=null)firestoreSyncService.sincronizarBoletaYDetalles(saved);return toDto(saved);
             } catch(RuntimeException failure){log.error("Confirmación de pago pendiente; los commits remotos son idempotentes. orderId={}",id,failure);throw new OrderException("Confirmación pendiente para orden "+id+"; reintenta el pago para completar la saga");}
         }

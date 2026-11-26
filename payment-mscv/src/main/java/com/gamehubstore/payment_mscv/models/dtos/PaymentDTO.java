@@ -28,15 +28,13 @@ public class PaymentDTO {
     @NotBlank(message = "El tipo de pago es obligatorio")
     private String tipoPago; // EJ: TARJETA_CREDITO, TRANSFERENCIA, PAYPAL
 
-    @NotBlank(message = "El estado del pago es obligatorio")
-    private String estadoPago; // EJ: PENDIENTE, APROBADO, RECHAZADO, REEMBOLSADO
+    private String estadoPago; // EJ: PENDIENTE, APROBADO, RECHAZADO, REEMBOLSADO (por defecto APROBADO)
 
     // No lleva anotaciones de validación porque el cliente no lo envía en el POST,
     // pero viaja lleno en el JSON de respuesta cuando el servicio lo genera.
     private String codigoPago;
 
-    @NotNull(message = "La fecha de pago no puede ser nula")
     @PastOrPresent(message = "La fecha de pago no puede ser futura")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime fechaPago; // ALINEADO: Mismo nombre que en la entidad Payment para mapeo directo
+    private LocalDateTime fechaPago; // Generada por el servidor si no se envía
 }

@@ -103,11 +103,12 @@ public class SecurityConfig {
                                 "/api/v2/categories/**",
                                 "/api/v1/inventories/stock",
                                 "/api/v1/promotions/validar",
+                                "/api/v1/promotions/active",
                                 "/api/v1/reviews/product/**",
                                 "/api/v1/reviews/resumen",
                                 "/api/v1/shippings/seguimiento/**"
                         ).permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/v1/orders/carrito/validar").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/v1/orders/carrito/validar", "/api/v1/promotions/validar").permitAll()
 
                         // 3. Productos y Categorías: mutaciones exclusivas de ADMIN (VENDEDOR y CLIENTE -> 403)
                         .pathMatchers(HttpMethod.POST, "/api/v1/products/**", "/api/v2/products/**", "/api/v1/categories/**", "/api/v2/categories/**").hasRole("ADMIN")
@@ -141,7 +142,8 @@ public class SecurityConfig {
                         .pathMatchers("/api/v1/cuentas", "/api/v1/cuentas/**").hasRole("ADMIN")
 
                         // 7. Pagos de cliente y administración de módulos operativos
-                        .pathMatchers(HttpMethod.POST, "/api/v1/payments").hasAnyRole("ADMIN", "CLIENTE")
+                        .pathMatchers(HttpMethod.POST, "/api/v1/payments", "/api/v1/payments/simular").hasAnyRole("ADMIN", "CLIENTE")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/payments/order/**").hasAnyRole("ADMIN", "VENDEDOR", "CLIENTE")
                         .pathMatchers("/api/v1/inventories/**", "/api/v1/promotions/**", "/api/v1/payments/**", "/api/v1/shippings/**", "/api/v1/warranties/**", "/api/v1/notifications/**").hasRole("ADMIN")
 
                         .anyExchange().authenticated())

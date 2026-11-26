@@ -2,6 +2,7 @@ package com.gamehubstore.payment_mscv.controllers;
 
 import com.gamehubstore.payment_mscv.models.Payment;
 import com.gamehubstore.payment_mscv.models.dtos.PaymentDTO;
+import com.gamehubstore.payment_mscv.models.dtos.SimularPagoRequest;
 import com.gamehubstore.payment_mscv.services.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,6 +38,22 @@ public class PaymentController {
     public ResponseEntity<PaymentDTO> registrarPago(@Valid @RequestBody PaymentDTO paymentDTO) {
         PaymentDTO nuevoPago = paymentService.save(paymentDTO);
         return new ResponseEntity<>(nuevoPago, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/simular")
+    @Operation(
+            summary = "Simular pago en pasarela (Webpay/Tarjeta)",
+            description = "Consulta el total exacto de la orden en order-mscv, registra el pago APROBADO (o RECHAZADO) y actualiza automáticamente la orden a PAGADA (sincronizando Firestore)."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Pago simulado y orden actualizada exitosamente",
+                    content = @Content(schema = @Schema(implementation = PaymentDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos"),
+            @ApiResponse(responseCode = "422", description = "La orden no existe, ya está pagada o el monto no coincide")
+    })
+    public ResponseEntity<PaymentDTO> simularPago(@Valid @RequestBody SimularPagoRequest request) {
+        PaymentDTO resultado = paymentService.simularPago(request);
+        return new ResponseEntity<>(resultado, HttpStatus.CREATED);
     }
 
     @GetMapping

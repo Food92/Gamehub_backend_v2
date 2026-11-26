@@ -93,8 +93,8 @@ public class OrderController {
         return ResponseEntity.ok(orderService.update(orderDTO, orderId));
     }
 
-    // ENDPOINT PARA EL VENDEDOR/SISTEMA: Cambiar el estado del pedido (ej: pasar de PAGADA a EN_DESPACHO)
-    @PatchMapping("/{orderId}/estado")
+    // ENDPOINT PARA EL VENDEDOR/SISTEMA/PASARELA: Cambiar el estado del pedido (acepta PATCH y PUT para Feign)
+    @RequestMapping(value = "/{orderId}/estado", method = {RequestMethod.PATCH, RequestMethod.PUT})
     @Operation(
             summary = "Actualizar estado de una orden (Webhook/Vendedor)",
             description = "Avanza el ciclo de vida de una orden. Si cambia a 'PAGADA', notifica internamente para procesar las rebajas físicas definitivas del Inventario."
