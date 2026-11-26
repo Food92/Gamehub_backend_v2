@@ -11,10 +11,10 @@
 	</parent>
 
 	<groupId>com.gamehubstore</groupId>
-	<artifactId>warranty-mscv</artifactId>
+	<artifactId>category-mscv</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>warranty-mscv</name>
-	<description>Microservicio de Garantías para GameHub Store</description>
+	<name>category-mscv</name>
+	<description>Microservicio de Categorías para GameHub Store</description>
 
 	<properties>
 		<java.version>21</java.version>
@@ -68,6 +68,11 @@
 			<groupId>io.swagger.core.v3</groupId>
 			<artifactId>swagger-models-jakarta</artifactId>
 			<version>2.2.22</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.firebase</groupId>
+			<artifactId>firebase-admin</artifactId>
+			<version>9.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>net.datafaker</groupId>

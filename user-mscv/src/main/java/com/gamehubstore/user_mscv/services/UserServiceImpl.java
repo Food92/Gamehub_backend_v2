@@ -20,6 +20,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired(required = false)
+    private FirestoreSyncService firestoreSyncService;
+
     @Override
     @Transactional
     public UserDTO save(UserDTO userDTO) {
@@ -42,6 +45,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User savedUser = userRepository.save(newUser);
+        if (firestoreSyncService != null) firestoreSyncService.sincronizarUsuario(savedUser);
 
         // Mapear de Entidad de regreso al DTO de salida
         UserDTO dto = new UserDTO();
@@ -86,7 +90,9 @@ public class UserServiceImpl implements UserService {
             updateUser.setEstado(user.getEstado());
         }
 
-        return userRepository.save(updateUser);
+        User saved = userRepository.save(updateUser);
+        if (firestoreSyncService != null) firestoreSyncService.sincronizarUsuario(saved);
+        return saved;
     }
 
     @Override
@@ -98,6 +104,7 @@ public class UserServiceImpl implements UserService {
             throw new UserException("No se puede eliminar. Usuario no encontrado");
         }
         userRepository.deleteById(id);
+        if (firestoreSyncService != null) firestoreSyncService.eliminarUsuario(id);
     }
 
     @Override
@@ -108,7 +115,8 @@ public class UserServiceImpl implements UserService {
                 () -> new UserException("No se puede desactivar. Usuario no encontrado"));
 
         findUser.setEstado(false); // Baja lógica requerida por el caso semestral
-        userRepository.save(findUser);
+        User saved = userRepository.save(findUser);
+        if (firestoreSyncService != null) firestoreSyncService.sincronizarUsuario(saved);
     }
 
     @Override
@@ -127,5 +135,31 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public List<User> findByEstadoFalse() {
         return userRepository.findByEstadoFalse();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User findByCorreo(String correo) {
+        return userRepository.findByCorreo(correo)
+                .orElseThrow(() -> new UserException("Usuario no encontrado con el correo: " + correo));
+    }
+
+    @Override
+    @Transactional
+    public User updateByCorreo(String correo, UserDTO dto) {
+        log.info("operation={} started", "updateByCorreo");
+        User existing = findByCorreo(correo);
+        if (dto.getNombreCompleto() != null && !dto.getNombreCompleto().isBlank()) {
+            existing.setNombreCompleto(dto.getNombreCompleto());
+        }
+        if (dto.getApellidoCompleto() != null && !dto.getApellidoCompleto().isBlank()) {
+            existing.setApellidoCompleto(dto.getApellidoCompleto());
+        }
+        if (dto.getTelefono() != null && !dto.getTelefono().isBlank()) {
+            existing.setTelefono(dto.getTelefono());
+        }
+        User saved = userRepository.save(existing);
+        if (firestoreSyncService != null) firestoreSyncService.sincronizarUsuario(saved);
+        return saved;
     }
 }

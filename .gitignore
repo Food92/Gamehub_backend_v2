@@ -5,6 +5,7 @@ target/
 .kotlin
 
 ### IntelliJ IDEA ###
+.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
@@ -12,6 +13,7 @@ target/
 *.iws
 *.iml
 *.ipr
+*.log
 
 ### Eclipse ###
 .apt_generated
@@ -42,5 +44,13 @@ build/
 **/data/*.trace.db
 
 # Local secrets
+.env
+.env.local
+.env.development
+.env.production
 *.env
 !.env.example
+firebase-service-account.json
+*-service-account.json
+firebase-adminsdk-*.json
+*-firebase-adminsdk-*.json

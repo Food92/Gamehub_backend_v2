@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.gamehubstore.category_mscv.exceptions.CategoryException;
 import com.gamehubstore.category_mscv.models.Category;
+import com.gamehubstore.category_mscv.models.dtos.CategoryCountDTO;
 import com.gamehubstore.category_mscv.client.ProductClient;
 import com.gamehubstore.category_mscv.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private ProductClient productClient;
 
+    @Autowired(required = false)
+    private FirestoreSyncService firestoreSyncService;
+
     @Override
     public Category save(Category category) {
         log.info("operation={} started", "save");
@@ -29,7 +33,9 @@ public class CategoryServiceImpl implements CategoryService {
             throw new CategoryException("Nombre de categoria ya existe");
         }
         category.setEstado(Category.EstadoCategory.ACTIVO);
-        return categoryRepository.save(category);
+        Category saved = categoryRepository.save(category);
+        if (firestoreSyncService != null) firestoreSyncService.sincronizarCategoria(saved);
+        return saved;
     }
 
 
@@ -51,7 +57,9 @@ public class CategoryServiceImpl implements CategoryService {
         Category oldCategory = findById(id);
         if (nombre != null && !nombre.isBlank()) oldCategory.setNombreCategory(nombre);
         if (descripcion != null) oldCategory.setDescripcionCategory(descripcion);
-        return categoryRepository.save(oldCategory);
+        Category saved = categoryRepository.save(oldCategory);
+        if (firestoreSyncService != null) firestoreSyncService.sincronizarCategoria(saved);
+        return saved;
     }
 
 
@@ -68,7 +76,30 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         categoria.setEstado(Category.EstadoCategory.INACTIVO);
-        categoryRepository.save(categoria);
+        Category saved = categoryRepository.save(categoria);
+        if (firestoreSyncService != null) firestoreSyncService.sincronizarCategoria(saved);
+    }
+
+    @Override
+    public List<CategoryCountDTO> findAllWithProductCount() {
+        log.info("operation={} started", "findAllWithProductCount");
+        return categoryRepository.findAll().stream().map(cat -> {
+            long count = 0L;
+            try {
+                count = productClient.byCategory(cat.getIdCategory()).stream()
+                        .filter(p -> Boolean.TRUE.equals(p.get("estado")))
+                        .count();
+            } catch (RuntimeException ex) {
+                log.warn("No se pudo obtener conteo de productos para categoriaId={}: {}", cat.getIdCategory(), ex.getMessage());
+            }
+            return new CategoryCountDTO(
+                    cat.getIdCategory(),
+                    cat.getNombreCategory(),
+                    cat.getDescripcionCategory(),
+                    cat.getEstado(),
+                    count
+            );
+        }).toList();
     }
 
 
