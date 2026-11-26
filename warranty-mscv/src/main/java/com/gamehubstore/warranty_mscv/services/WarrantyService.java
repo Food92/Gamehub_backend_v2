@@ -1,6 +1,7 @@
 package com.gamehubstore.warranty_mscv.services;
 
 import com.gamehubstore.warranty_mscv.models.Warranty;
+import com.gamehubstore.warranty_mscv.models.dtos.ResumenGarantiasDTO;
 import com.gamehubstore.warranty_mscv.models.dtos.WarrantyDTO;
 import java.util.List;
 
@@ -13,4 +14,5 @@ public interface WarrantyService {
     Warranty updateStatusOrDiagnostic(Long id, String estado, String diagnostico, String resolucion);
     Warranty closeWarranty(Long id, String resolucion);
     List<Warranty> findAll();
+    ResumenGarantiasDTO obtenerResumen();
 }

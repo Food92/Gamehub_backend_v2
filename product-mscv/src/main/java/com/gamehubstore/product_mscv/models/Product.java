@@ -58,4 +58,10 @@ public class Product {
 
     @Column(name = "imagen_url", length = 1000)
     private String imagenUrl;
+
+    @Column(name = "precio_oferta")
+    private Double precioOferta;
+
+    @Column(name = "en_oferta")
+    private Boolean enOferta = false;
 }

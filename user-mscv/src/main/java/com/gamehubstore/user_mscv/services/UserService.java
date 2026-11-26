@@ -15,4 +15,6 @@ public interface UserService {
     List<User> findAll();
     List<User> findByEstadoTrue();
     List<User> findByEstadoFalse();
+    User findByCorreo(String correo);
+    User updateByCorreo(String correo, UserDTO dto);
 }

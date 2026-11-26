@@ -9,6 +9,9 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -43,6 +46,17 @@ public class Shipping {
     private LocalDate fechaEnvio;
 
     private LocalDate fechaEntrega; // 👈 Agregado para cumplir con la regla de negocio: "No cambiar a entregado sin fecha de entrega"
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "shipping_events", joinColumns = @JoinColumn(name = "shipping_id"))
+    private List<ShippingEvent> eventos = new ArrayList<>();
+
+    public void agregarEvento(String estadoEvento, String descripcion) {
+        if (this.eventos == null) {
+            this.eventos = new ArrayList<>();
+        }
+        this.eventos.add(new ShippingEvent(estadoEvento, descripcion, LocalDateTime.now()));
+    }
 
     @PrePersist
     protected void onCreate() {

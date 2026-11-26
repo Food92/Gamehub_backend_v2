@@ -99,4 +99,22 @@ public class PaymentController {
     public ResponseEntity<Payment> cancelarPago(@PathVariable Long paymentId) {
         return ResponseEntity.ok(paymentService.cancelPayment(paymentId));
     }
+
+    @PostMapping("/order/{orderId}/confirmar")
+    @Operation(summary = "Confirmar pago más reciente de una orden")
+    public ResponseEntity<Payment> confirmarPorOrden(@PathVariable Long orderId) {
+        return ResponseEntity.ok(paymentService.confirmarPorOrden(orderId));
+    }
+
+    @PostMapping("/order/{orderId}/anular")
+    @Operation(summary = "Anular (rechazar) pago más reciente de una orden")
+    public ResponseEntity<Payment> anularPorOrden(@PathVariable Long orderId) {
+        return ResponseEntity.ok(paymentService.anularPorOrden(orderId));
+    }
+
+    @PostMapping("/order/{orderId}/revertir")
+    @Operation(summary = "Revertir (reembolsar) pago más reciente de una orden")
+    public ResponseEntity<Payment> revertirPorOrden(@PathVariable Long orderId) {
+        return ResponseEntity.ok(paymentService.revertirPorOrden(orderId));
+    }
 }

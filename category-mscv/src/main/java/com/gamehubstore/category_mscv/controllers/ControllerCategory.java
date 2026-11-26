@@ -1,6 +1,7 @@
 package com.gamehubstore.category_mscv.controllers;
 
 import com.gamehubstore.category_mscv.models.Category;
+import com.gamehubstore.category_mscv.models.dtos.CategoryCountDTO;
 import com.gamehubstore.category_mscv.models.dtos.CategoryDTO;
 import com.gamehubstore.category_mscv.services.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,6 +45,13 @@ public class ControllerCategory {
     public ResponseEntity<List<Category>> findAll() {
         // ResponseEntity.ok(...) = cuerpo + codigo HTTP 200.
         return ResponseEntity.ok(categoryService.findAll());
+    }
+
+    @GetMapping("/con-conteo")
+    @Operation(summary = "Listar categorías con conteo de productos activos")
+    @ApiResponse(responseCode = "200", description = "Operación Exitosa")
+    public ResponseEntity<List<CategoryCountDTO>> findAllWithCount() {
+        return ResponseEntity.ok(categoryService.findAllWithProductCount());
     }
 
     // {id} es una variable de ruta: GET /api/v1/categories/5 => id = 5.

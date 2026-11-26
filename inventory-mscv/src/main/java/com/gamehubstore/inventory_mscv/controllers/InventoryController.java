@@ -2,7 +2,10 @@ package com.gamehubstore.inventory_mscv.controllers;
 
 import com.gamehubstore.inventory_mscv.models.Inventory;
 import com.gamehubstore.inventory_mscv.models.InventoryReservation;
+import com.gamehubstore.inventory_mscv.models.MovimientoInventario;
 import com.gamehubstore.inventory_mscv.models.dtos.InventoryDTO;
+import com.gamehubstore.inventory_mscv.models.dtos.MovimientoRequestDTO;
+import com.gamehubstore.inventory_mscv.models.dtos.StockAvailabilityDTO;
 import com.gamehubstore.inventory_mscv.services.InventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -195,5 +198,23 @@ public class InventoryController {
             @RequestParam Long cantidad
     ) {
         return ResponseEntity.ok(inventoryService.salidaStock(idProducto, cantidad));
+    }
+
+    @GetMapping("/stock")
+    @Operation(summary = "Consultar disponibilidad agregada por lista de productos")
+    public ResponseEntity<List<StockAvailabilityDTO>> consultarStock(@RequestParam List<Long> productoIds) {
+        return ResponseEntity.ok(inventoryService.consultarDisponibilidad(productoIds));
+    }
+
+    @GetMapping("/movimientos")
+    @Operation(summary = "Listar historial de movimientos de inventario")
+    public ResponseEntity<List<MovimientoInventario>> listarMovimientos(@RequestParam(required = false) Long idProducto) {
+        return ResponseEntity.ok(inventoryService.listarMovimientos(idProducto));
+    }
+
+    @PostMapping("/movimientos")
+    @Operation(summary = "Registrar movimiento manual de inventario (INGRESO, SALIDA, AJUSTE)")
+    public ResponseEntity<MovimientoInventario> registrarMovimiento(@Valid @RequestBody MovimientoRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(inventoryService.registrarMovimiento(request));
     }
 }

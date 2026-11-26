@@ -19,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 // @RestController: cada metodo devuelve datos (JSON), no vistas HTML.
 // @RequestMapping: prefijo comun de las rutas. Aqui es la version 1 de la API.
@@ -218,5 +219,36 @@ public class ProductController {
     ) {
         this.productService.desactivar(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/catalogo")
+    @Operation(summary = "Catálogo público con filtros y ordenamiento")
+    public ResponseEntity<List<Product>> catalogo(
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) String buscar,
+            @RequestParam(required = false) Boolean soloOfertas,
+            @RequestParam(required = false) String orden) {
+        return ResponseEntity.ok(this.productService.buscarCatalogo(categoriaId, buscar, soloOfertas, orden));
+    }
+
+    @GetMapping("/batch")
+    @Operation(summary = "Consultar múltiples productos por IDs")
+    public ResponseEntity<List<Product>> findByIds(@RequestParam List<Long> ids) {
+        return ResponseEntity.ok(this.productService.findByIds(ids));
+    }
+
+    @GetMapping("/conteo")
+    @Operation(summary = "Contar productos agrupados por categoría")
+    public ResponseEntity<Map<Long, Long>> conteo(@RequestParam(defaultValue = "true") boolean soloActivos) {
+        return ResponseEntity.ok(this.productService.contarPorCategoria(soloActivos));
+    }
+
+    @PatchMapping("/{id}/activo")
+    @Operation(summary = "Activar o desactivar un producto")
+    public ResponseEntity<Product> cambiarActivo(
+            @PathVariable Long id,
+            @RequestBody Map<String, Boolean> body) {
+        boolean activo = body != null && Boolean.TRUE.equals(body.get("activo"));
+        return ResponseEntity.ok(this.productService.cambiarActivo(id, activo));
     }
 }

@@ -2,6 +2,9 @@ package com.gamehubstore.order_mscv.controllers;
 
 import com.gamehubstore.order_mscv.models.Order;
 import com.gamehubstore.order_mscv.models.dtos.OrderDTO;
+import com.gamehubstore.order_mscv.models.dtos.ResumenOrdenesDTO;
+import com.gamehubstore.order_mscv.models.dtos.ValidacionCarritoDTO;
+import com.gamehubstore.order_mscv.models.dtos.ValidarCarritoRequest;
 import com.gamehubstore.order_mscv.services.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -126,5 +129,17 @@ public class OrderController {
     })
     public ResponseEntity<Order> cancelarOrden(@PathVariable Long orderId) {
         return ResponseEntity.ok(orderService.cancelOrder(orderId));
+    }
+
+    @PostMapping("/carrito/validar")
+    @Operation(summary = "Validar carrito de compras sin persistir orden")
+    public ResponseEntity<ValidacionCarritoDTO> validarCarrito(@Valid @RequestBody ValidarCarritoRequest request) {
+        return ResponseEntity.ok(orderService.validarCarrito(request));
+    }
+
+    @GetMapping("/resumen")
+    @Operation(summary = "Resumen operativo de órdenes")
+    public ResponseEntity<ResumenOrdenesDTO> obtenerResumen() {
+        return ResponseEntity.ok(orderService.obtenerResumen());
     }
 }

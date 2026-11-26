@@ -121,4 +121,10 @@ public class ShippingController {
             @PathVariable String estado) {
         return ResponseEntity.ok(shippingService.findByEstado(estado));
     }
+
+    @GetMapping("/seguimiento/{tracking}")
+    @Operation(summary = "Seguimiento público por código de tracking")
+    public ResponseEntity<Shipping> seguimientoPorTracking(@PathVariable String tracking) {
+        return ResponseEntity.ok(shippingService.findByTracking(tracking));
+    }
 }

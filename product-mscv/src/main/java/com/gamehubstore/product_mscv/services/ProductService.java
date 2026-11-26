@@ -4,6 +4,7 @@ import com.gamehubstore.product_mscv.models.Product;
 import com.gamehubstore.product_mscv.models.dtos.ProductDTO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ProductService {
     List<ProductDTO> findAll();
@@ -17,4 +18,8 @@ public interface ProductService {
     List<Product> findByIdCategory(Long idCategory);
     List<Product> findByEstado(Boolean estado);
 
+    List<Product> buscarCatalogo(Long categoriaId, String buscar, Boolean soloOfertas, String orden);
+    List<Product> findByIds(List<Long> ids);
+    Map<Long, Long> contarPorCategoria(boolean soloActivos);
+    Product cambiarActivo(Long id, boolean activo);
 }

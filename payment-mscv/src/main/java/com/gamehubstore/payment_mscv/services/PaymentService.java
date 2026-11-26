@@ -14,4 +14,8 @@ public interface PaymentService {
     Payment updatePayment(String estadoPago, Long paymentId); // Corregido a CamelCase
     Payment cancelPayment(Long paymentId);                    // Corregido a CamelCase
     List<Payment> findAll();
+
+    Payment confirmarPorOrden(Long orderId);
+    Payment anularPorOrden(Long orderId);
+    Payment revertirPorOrden(Long orderId);
 }

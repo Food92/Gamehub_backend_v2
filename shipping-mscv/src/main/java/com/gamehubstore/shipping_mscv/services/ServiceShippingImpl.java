@@ -1,4 +1,4 @@
-package com.gamehubstore.shipping_mscv.services.impl;
+package com.gamehubstore.shipping_mscv.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +65,7 @@ public class ServiceShippingImpl implements ShippingService {
         shipping.setDireccion(shippingDTO.getDireccion());
         shipping.setTransportista(shippingDTO.getTransportista());
         shipping.setTracking(shippingDTO.getTracking());
+        shipping.agregarEvento("CREADO", "Despacho creado");
         // Nota: El estado "CREADO" y la "fechaEnvio" se asignan solas en el @PrePersist de la entidad
 
         Shipping guardado = repositoryShipping.save(shipping);
@@ -108,6 +109,7 @@ public class ServiceShippingImpl implements ShippingService {
                 orderClient.updateEstado(existing.getOrderId(), "ENTREGADA");
             }
             existing.setEstado(nuevoEstado);
+            existing.agregarEvento(nuevoEstado, "Estado actualizado a " + nuevoEstado);
         }
 
         // Campos mutables secundarios
@@ -133,6 +135,7 @@ public class ServiceShippingImpl implements ShippingService {
         }
 
         shipping.setEstado("CANCELADO");
+        shipping.agregarEvento("CANCELADO", "Despacho cancelado");
         repositoryShipping.save(shipping);
     }
 
@@ -158,5 +161,12 @@ public class ServiceShippingImpl implements ShippingService {
     @Transactional(readOnly = true)
     public List<Shipping> findByEstado(String estado) {
         return repositoryShipping.findByEstado(estado.toUpperCase().trim());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Shipping findByTracking(String tracking) {
+        return repositoryShipping.findByTracking(tracking.trim())
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró despacho con tracking: " + tracking));
     }
 }

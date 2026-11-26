@@ -1,4 +1,4 @@
-package com.gamehubstore.payment_mscv.services.impl;
+package com.gamehubstore.payment_mscv.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -153,5 +154,32 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional(readOnly = true)
     public List<Payment> findAll() {
         return paymentRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public Payment confirmarPorOrden(Long orderId) {
+        Payment ultimo = obtenerUltimoPagoDeOrden(orderId);
+        return updatePayment("APROBADO", ultimo.getPaymentId());
+    }
+
+    @Override
+    @Transactional
+    public Payment anularPorOrden(Long orderId) {
+        Payment ultimo = obtenerUltimoPagoDeOrden(orderId);
+        return updatePayment("RECHAZADO", ultimo.getPaymentId());
+    }
+
+    @Override
+    @Transactional
+    public Payment revertirPorOrden(Long orderId) {
+        Payment ultimo = obtenerUltimoPagoDeOrden(orderId);
+        return updatePayment("REEMBOLSADO", ultimo.getPaymentId());
+    }
+
+    private Payment obtenerUltimoPagoDeOrden(Long orderId) {
+        return paymentRepository.findByOrderId(orderId).stream()
+                .max(Comparator.comparing(Payment::getPaymentId))
+                .orElseThrow(() -> new PaymentException("No existen pagos asociados a la orden: " + orderId));
     }
 }

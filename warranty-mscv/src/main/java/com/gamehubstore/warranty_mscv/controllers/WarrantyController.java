@@ -2,6 +2,8 @@ package com.gamehubstore.warranty_mscv.controllers;
 
 import com.gamehubstore.warranty_mscv.models.Warranty;
 import com.gamehubstore.warranty_mscv.models.dtos.ErrorDetails;
+import com.gamehubstore.warranty_mscv.models.dtos.ResolverGarantiaDTO;
+import com.gamehubstore.warranty_mscv.models.dtos.ResumenGarantiasDTO;
 import com.gamehubstore.warranty_mscv.models.dtos.WarrantyDTO;
 import com.gamehubstore.warranty_mscv.services.WarrantyService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -170,5 +172,26 @@ public class WarrantyController {
             @Parameter(description = "Resolución del ticket (Ej: Reemplazo de consola por falla de fábrica)", required = true)
             @RequestParam String resolucion) {
         return ResponseEntity.ok(warrantyService.closeWarranty(id, resolucion));
+    }
+
+    @GetMapping("/resumen")
+    @Operation(summary = "Resumen de solicitudes de garantía por estado")
+    public ResponseEntity<ResumenGarantiasDTO> obtenerResumen() {
+        return ResponseEntity.ok(warrantyService.obtenerResumen());
+    }
+
+    @PutMapping("/{id}/resolver")
+    @Operation(summary = "Resolver o actualizar garantía con cuerpo JSON")
+    public ResponseEntity<Warranty> resolverGarantia(
+            @PathVariable Long id,
+            @Valid @RequestBody ResolverGarantiaDTO dto) {
+        if ("CERRADA".equalsIgnoreCase(dto.getEstado()) || "CERRADO".equalsIgnoreCase(dto.getEstado())) {
+            if (dto.getDiagnostico() != null) {
+                warrantyService.updateStatusOrDiagnostic(id, null, dto.getDiagnostico(), null);
+            }
+            return ResponseEntity.ok(warrantyService.closeWarranty(id, dto.getResolucion()));
+        }
+        return ResponseEntity.ok(warrantyService.updateStatusOrDiagnostic(
+                id, dto.getEstado(), dto.getDiagnostico(), dto.getResolucion()));
     }
 }

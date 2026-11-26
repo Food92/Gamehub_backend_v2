@@ -2,6 +2,7 @@ package com.gamehubstore.category_mscv.services;
 
 
 import com.gamehubstore.category_mscv.models.Category;
+import com.gamehubstore.category_mscv.models.dtos.CategoryCountDTO;
 
 import java.util.List;
 
@@ -11,4 +12,5 @@ public interface CategoryService {
     Category update(Long id,String nombre, String descripcion);
     void desactivar(Long id);
     Category findById(Long id);
+    List<CategoryCountDTO> findAllWithProductCount();
 }

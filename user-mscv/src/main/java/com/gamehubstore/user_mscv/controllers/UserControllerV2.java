@@ -123,7 +123,7 @@ public class UserControllerV2 {
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar permanentemente un usuario - V2", description = "Borra físicamente el registro de la BD")
     @ApiResponse(responseCode = "204", description = "Usuario eliminado correctamente")
-    public ResponseEntity<Void> findAll(
+    public ResponseEntity<Void> deleteById(
             @Parameter(description = "ID del usuario a eliminar", required = true, example = "1")
             @PathVariable Long id
     ) {

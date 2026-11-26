@@ -136,4 +136,18 @@ public class UserController {
     public ResponseEntity<List<User>> listarUsuariosInactivos() {
         return ResponseEntity.ok(userService.findByEstadoFalse());
     }
+
+    @GetMapping("/correo")
+    @Operation(summary = "Buscar usuario por correo electrónico", description = "Obtiene el perfil del usuario mediante su correo")
+    public ResponseEntity<User> buscarPorCorreo(@RequestParam String correo) {
+        return ResponseEntity.ok(userService.findByCorreo(correo));
+    }
+
+    @PutMapping("/correo")
+    @Operation(summary = "Actualizar perfil de usuario por correo", description = "Actualiza nombre, apellido y teléfono buscando por correo electrónico")
+    public ResponseEntity<User> actualizarPorCorreo(
+            @RequestParam String correo,
+            @RequestBody UserDTO userDTO) {
+        return ResponseEntity.ok(userService.updateByCorreo(correo, userDTO));
+    }
 }

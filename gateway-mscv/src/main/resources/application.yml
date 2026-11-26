@@ -1,6 +1,6 @@
 spring:
   config:
-    import: optional:file:./.env[.properties]
+    import: optional:file:./.env[.properties],optional:file:../.env[.properties]
   application:
     name: gamehub-gateway
   cloud:
@@ -15,17 +15,17 @@ spring:
         - id: user-service
           uri: lb://user-mscv
           predicates:
-            - Path=/api/v1/users/**,/api/v1/direcciones/**
+            - Path=/api/v1/users/**,/api/v1/direcciones/**,/api/v2/users/**,/api/v2/addresses/**
 
         - id: product-service
           uri: lb://product-mscv
           predicates:
-            - Path=/api/v1/products/**
+            - Path=/api/v1/products/**,/api/v2/products/**
 
         - id: category-service
           uri: lb://category-mscv
           predicates:
-            - Path=/api/v1/categories/**
+            - Path=/api/v1/categories/**,/api/v2/categories/**
 
         - id: inventory-service
           uri: lb://inventory-mscv
@@ -164,6 +164,9 @@ eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    hostname: localhost
+    prefer-ip-address: false
 
 springdoc:
   api-docs:
@@ -212,4 +215,4 @@ springdoc:
         url: /api-docs/notifications
 
 jwt:
-  secret: ${JWT_SECRET}}
+  secret: ${JWT_SECRET}

@@ -2,6 +2,9 @@ package com.gamehubstore.order_mscv.services;
 
 import com.gamehubstore.order_mscv.models.Order;
 import com.gamehubstore.order_mscv.models.dtos.OrderDTO;
+import com.gamehubstore.order_mscv.models.dtos.ResumenOrdenesDTO;
+import com.gamehubstore.order_mscv.models.dtos.ValidacionCarritoDTO;
+import com.gamehubstore.order_mscv.models.dtos.ValidarCarritoRequest;
 
 import java.util.List;
 
@@ -15,4 +18,6 @@ public interface OrderService {
     Order cancelOrder(Long orderId);
     OrderDTO findByIdDTO(Long orderId);
     OrderDTO updateEstado(Long orderId, String estado);
+    ValidacionCarritoDTO validarCarrito(ValidarCarritoRequest request);
+    ResumenOrdenesDTO obtenerResumen();
 }

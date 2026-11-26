@@ -21,4 +21,6 @@ public class ProductDTO {
     private Boolean estado;
     private Audit audit = new Audit();
     private String imagenUrl;
+    private Double precioOferta;
+    private Boolean enOferta;
 }

@@ -7,6 +7,8 @@ import com.gamehubstore.promotion_mscv.models.*; import com.gamehubstore.promoti
  @PutMapping("/{id}") public Promotion update(@PathVariable Long id,@Valid @RequestBody Promotion p){return service.update(id,p);}
  @DeleteMapping("/{id}") public ResponseEntity<Void> deactivate(@PathVariable Long id){service.deactivate(id);return ResponseEntity.noContent().build();}
  @PostMapping("/validate") public Map<String,BigDecimal> validate(@RequestParam @NotBlank String code,@RequestParam @DecimalMin("0.00") BigDecimal total){return Map.of("discount",service.validateAndCalculate(code,total));}
+ @GetMapping("/validar") public CuponValidacionDTO validar(@RequestParam @NotBlank String codigo,@RequestParam @DecimalMin("0.00") BigDecimal subtotal){return service.validarDetalle(codigo,subtotal);}
+ @PatchMapping("/{id}/activo") public Promotion cambiarActivo(@PathVariable Long id,@RequestBody Map<String,Boolean> body){boolean active=body!=null&&Boolean.TRUE.equals(body.get("active"));return service.cambiarActivo(id,active);}
  @PutMapping("/reservations/{orderId}") public PromotionReservation reserve(@PathVariable Long orderId,@RequestParam String code,@RequestParam BigDecimal total){return service.reserve(orderId,code,total);}
  @PutMapping("/reservations/{orderId}/confirm") public PromotionReservation commit(@PathVariable Long orderId){return service.commit(orderId);}
  @DeleteMapping("/reservations/{orderId}") public ResponseEntity<Void> release(@PathVariable Long orderId){service.release(orderId);return ResponseEntity.noContent().build();}

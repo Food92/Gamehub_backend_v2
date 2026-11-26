@@ -11,6 +11,7 @@ import com.gamehubstore.warranty_mscv.exceptions.WarrantyException;
 import com.gamehubstore.warranty_mscv.models.Warranty;
 import com.gamehubstore.warranty_mscv.models.dtos.OrderDTO;
 import com.gamehubstore.warranty_mscv.models.dtos.ProductDTO;
+import com.gamehubstore.warranty_mscv.models.dtos.ResumenGarantiasDTO;
 import com.gamehubstore.warranty_mscv.models.dtos.UserDTO;
 import com.gamehubstore.warranty_mscv.models.dtos.WarrantyDTO;
 import com.gamehubstore.warranty_mscv.repositories.WarrantyRepository;
@@ -19,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class WarrantyServiceImpl implements WarrantyService {
@@ -173,5 +176,21 @@ public class WarrantyServiceImpl implements WarrantyService {
     @Transactional(readOnly = true)
     public List<Warranty> findAll() {
         return warrantyRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResumenGarantiasDTO obtenerResumen() {
+        List<Warranty> todas = warrantyRepository.findAll();
+        Map<String, Long> porEstado = new LinkedHashMap<>();
+        long cerradas = 0L;
+        for (Warranty w : todas) {
+            String estado = w.getEstado() != null ? w.getEstado() : "CREADO";
+            porEstado.merge(estado, 1L, Long::sum);
+            if ("CERRADA".equalsIgnoreCase(estado) || "CERRADO".equalsIgnoreCase(estado)) {
+                cerradas++;
+            }
+        }
+        return new ResumenGarantiasDTO(todas.size(), porEstado, todas.size() - cerradas, cerradas);
     }
 }

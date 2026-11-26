@@ -16,10 +16,11 @@ public class Promotion {
  @NotNull @DecimalMin("0.00") private BigDecimal minimumAmount=BigDecimal.ZERO;
  @PositiveOrZero private Integer maxUses;
  @PositiveOrZero private Integer usedCount=0;
+ @DecimalMin("0.00") private BigDecimal maxDiscount;
  @Column(nullable=false) private boolean active=true;
  public Long getId(){return id;} public String getCode(){return code;} public void setCode(String v){code=v;}
  public String getType(){return type;} public void setType(String v){type=v;} public BigDecimal getValue(){return value;} public void setValue(BigDecimal v){value=v;}
  public LocalDate getStartDate(){return startDate;} public void setStartDate(LocalDate v){startDate=v;} public LocalDate getEndDate(){return endDate;} public void setEndDate(LocalDate v){endDate=v;}
  public BigDecimal getMinimumAmount(){return minimumAmount;} public void setMinimumAmount(BigDecimal v){minimumAmount=v;} public Integer getMaxUses(){return maxUses;} public void setMaxUses(Integer v){maxUses=v;}
- public Integer getUsedCount(){return usedCount;} public void setUsedCount(Integer v){usedCount=v;} public boolean isActive(){return active;} public void setActive(boolean v){active=v;}
+ public Integer getUsedCount(){return usedCount;} public void setUsedCount(Integer v){usedCount=v;} public BigDecimal getMaxDiscount(){return maxDiscount;} public void setMaxDiscount(BigDecimal v){maxDiscount=v;} public boolean isActive(){return active;} public void setActive(boolean v){active=v;}
 }

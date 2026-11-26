@@ -15,4 +15,5 @@ public interface ShippingService {
     List<Shipping> findByUserId(Long userId);
     List<Shipping> findByOrderId(Long orderId);
     List<Shipping> findByEstado(String estado);
+    Shipping findByTracking(String tracking);
 }

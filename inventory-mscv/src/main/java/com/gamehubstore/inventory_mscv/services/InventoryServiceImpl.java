@@ -10,7 +10,9 @@ import com.gamehubstore.inventory_mscv.models.InventoryReservation;
 import com.gamehubstore.inventory_mscv.repositories.InventoryReservationRepository;
 import com.gamehubstore.inventory_mscv.models.MovimientoInventario;
 import com.gamehubstore.inventory_mscv.models.dtos.InventoryDTO;
+import com.gamehubstore.inventory_mscv.models.dtos.MovimientoRequestDTO;
 import com.gamehubstore.inventory_mscv.models.dtos.ProductDTO;
+import com.gamehubstore.inventory_mscv.models.dtos.StockAvailabilityDTO;
 import com.gamehubstore.inventory_mscv.repositories.InventoryRepository;
 import com.gamehubstore.inventory_mscv.repositories.MovimientoInventarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
@@ -269,5 +272,65 @@ public class InventoryServiceImpl implements InventoryService {
     @Transactional(readOnly = true)
     public List<Inventory> findByUbicacion(String ubicacion) {
         return inventoryRepository.findByUbicacion(ubicacion);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<StockAvailabilityDTO> consultarDisponibilidad(List<Long> productoIds) {
+        if (productoIds == null || productoIds.isEmpty()) {
+            return List.of();
+        }
+        return productoIds.stream().distinct().map(idProducto -> {
+            List<Inventory> registros = inventoryRepository.findByIdProducto(idProducto);
+            long disponible = registros.stream()
+                    .mapToLong(i -> i.getStockDisponible() != null ? i.getStockDisponible() : 0L)
+                    .sum();
+            long reservado = registros.stream()
+                    .mapToLong(i -> i.getStockReservado() != null ? i.getStockReservado() : 0L)
+                    .sum();
+            return new StockAvailabilityDTO(idProducto, disponible, reservado, disponible > 0);
+        }).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MovimientoInventario> listarMovimientos(Long idProducto) {
+        if (idProducto != null) {
+            return movimientoInventarioRepository.findByIdProductoOrderByFechaDesc(idProducto);
+        }
+        return movimientoInventarioRepository.findAllByOrderByFechaDesc();
+    }
+
+    @Override
+    @Transactional
+    public MovimientoInventario registrarMovimiento(MovimientoRequestDTO request) {
+        log.info("operation={} started", "registrarMovimiento");
+        Inventory inventory = inventoryRepository.findByIdProductoForUpdate(request.getIdProducto())
+                .orElseThrow(() -> new InventoryException("No existe inventario para producto " + request.getIdProducto()));
+
+        String tipo = request.getTipo().trim().toUpperCase(Locale.ROOT);
+        long cantidad = request.getCantidad();
+        long actual = inventory.getStockDisponible() != null ? inventory.getStockDisponible() : 0L;
+
+        switch (tipo) {
+            case "INGRESO", "ENTRADA" -> inventory.setStockDisponible(actual + cantidad);
+            case "SALIDA" -> {
+                if (actual < cantidad) {
+                    throw new InventoryException("Stock disponible insuficiente para registrar salida");
+                }
+                inventory.setStockDisponible(actual - cantidad);
+            }
+            case "AJUSTE" -> inventory.setStockDisponible(cantidad);
+            default -> throw new InventoryException("Tipo de movimiento inválido: " + request.getTipo());
+        }
+
+        inventoryRepository.save(inventory);
+
+        MovimientoInventario movimiento = new MovimientoInventario();
+        movimiento.setIdProducto(request.getIdProducto());
+        movimiento.setTipo(tipo);
+        movimiento.setCantidad(cantidad);
+        movimiento.setFecha(LocalDateTime.now());
+        return movimientoInventarioRepository.save(movimiento);
     }
 }

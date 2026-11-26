@@ -2,7 +2,10 @@ package com.gamehubstore.inventory_mscv.services;
 
 import com.gamehubstore.inventory_mscv.models.Inventory;
 import com.gamehubstore.inventory_mscv.models.InventoryReservation;
+import com.gamehubstore.inventory_mscv.models.MovimientoInventario;
 import com.gamehubstore.inventory_mscv.models.dtos.InventoryDTO;
+import com.gamehubstore.inventory_mscv.models.dtos.MovimientoRequestDTO;
+import com.gamehubstore.inventory_mscv.models.dtos.StockAvailabilityDTO;
 
 import java.util.List;
 
@@ -34,4 +37,8 @@ public interface InventoryService {
     InventoryReservation reservarParaOrden(Long orderId, Long idProducto, Long cantidad);
     InventoryReservation liberarReserva(Long orderId, Long idProducto);
     InventoryReservation confirmarReserva(Long orderId, Long idProducto);
+
+    List<StockAvailabilityDTO> consultarDisponibilidad(List<Long> productoIds);
+    List<MovimientoInventario> listarMovimientos(Long idProducto);
+    MovimientoInventario registrarMovimiento(MovimientoRequestDTO request);
 }

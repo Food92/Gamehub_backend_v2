@@ -1,6 +1,5 @@
 package com.gamehubstore.category_mscv.config;
 
-import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import org.springframework.context.annotation.Bean;
@@ -15,8 +14,8 @@ public class SwaggerConfig {
         return new OpenAPI()
                 // Info: cabecera que se muestra arriba en /docs/swagger-ui.html.
                 .info(new Info()
-                        .title("GameHub Store - Inventory Microservice API")
+                        .title("GameHub Store - Category Microservice API")
                         .version("1.0")
-                        .description("API dedicada al control de existencias, gestión de almacenes y reserva de stock síncrona para órdenes."));
+                        .description("API dedicada a la gestión del catálogo de categorías y conteo de productos activos."));
     }
 }

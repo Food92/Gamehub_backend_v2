@@ -1,6 +1,7 @@
-package com.gamehubstore.payment_mscv.exceptions; // 👈 Sugerencia: muévelo de .models a .exceptions
+package com.gamehubstore.payment_mscv.controllers;
 
 import com.gamehubstore.payment_mscv.exceptions.PaymentException;
+import com.gamehubstore.payment_mscv.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

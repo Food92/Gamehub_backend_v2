@@ -1,6 +1,6 @@
 spring:
   config:
-    import: optional:file:./.env[.properties]
+    import: optional:file:./.env[.properties],optional:file:../.env[.properties]
   application:
     name: review-mscv
   datasource:
@@ -24,9 +24,13 @@ eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    hostname: localhost
+    prefer-ip-address: false
 
 springdoc:
   api-docs:
     enabled: true
   swagger-ui:
     enabled: true
+    path: /docs/swagger-ui.html
