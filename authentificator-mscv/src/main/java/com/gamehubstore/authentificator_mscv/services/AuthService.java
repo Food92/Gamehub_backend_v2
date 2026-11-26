@@ -52,11 +52,8 @@ public class AuthService {
         // 3. Cifrar la contraseña con BCrypt
         cuenta.setPasswordHash(this.passwordEncoder.encode(request.getPassword()));
 
-        // 4. Asignar rol por defecto si no se envía uno específico
-        String rolAsignado = (request.getRol() == null || request.getRol().isBlank())
-                ? "ROLE_CLIENTE"
-                : request.getRol();
-        cuenta.setRol(rolAsignado);
+        // 4. Por seguridad, el registro público siempre asigna ROLE_CLIENTE (evita escalación de privilegios).
+        cuenta.setRol("ROLE_CLIENTE");
 
         // 5. CONFIGURACIÓN DEL ESTADO EN REGISTER:
         // Siempre se fuerza a true al registrarse para que la cuenta quede inmediatamente operativa.
@@ -126,6 +123,29 @@ public class AuthService {
         CuentaAcceso cuenta = buscarPorId(id);
         cuenta.setEstado(false);
         this.cuentaRepository.save(cuenta);
+    }
+
+    @Transactional(readOnly = true)
+    public AuthResponse renovarToken(String email) {
+        log.info("operation={} started", "renovarToken");
+        CuentaAcceso cuenta = this.cuentaRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cuenta no encontrada"));
+        if (!Boolean.TRUE.equals(cuenta.getEstado())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "La cuenta se encuentra desactivada.");
+        }
+        return construirRespuestaToken(cuenta);
+    }
+
+    @Transactional
+    public CuentaAcceso cambiarActivo(Long id, Boolean activo, String emailAdminActual) {
+        log.info("operation={} started", "cambiarActivo");
+        CuentaAcceso cuenta = buscarPorId(id);
+        if (Boolean.FALSE.equals(activo) && emailAdminActual != null
+                && cuenta.getEmail().equalsIgnoreCase(emailAdminActual)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No puedes desactivar tu propia cuenta");
+        }
+        cuenta.setEstado(activo);
+        return this.cuentaRepository.save(cuenta);
     }
 
     private AuthResponse construirRespuestaToken(CuentaAcceso cuenta) {

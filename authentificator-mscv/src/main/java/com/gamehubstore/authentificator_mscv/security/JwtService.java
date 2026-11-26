@@ -27,6 +27,10 @@ public class JwtService {
     public String generarToken(CuentaAcceso cuenta) {
         Instant ahora = Instant.now();
 
+        String rolSinPrefijo = cuenta.getRol() != null && cuenta.getRol().startsWith("ROLE_")
+                ? cuenta.getRol().substring(5)
+                : cuenta.getRol();
+
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("gamehub-auth-service")
                 .issuedAt(ahora)
@@ -34,6 +38,7 @@ public class JwtService {
                 .subject(cuenta.getEmail())
                 .claim("userId", cuenta.getId())
                 .claim("roles", cuenta.getRol())
+                .claim("role", rolSinPrefijo)
                 .build();
 
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();

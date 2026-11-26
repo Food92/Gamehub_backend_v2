@@ -22,6 +22,7 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) {
         crearCuentaSiNoExiste("admin@gamehub.com", "admin123", "ROLE_ADMIN");
+        crearCuentaSiNoExiste("vendedor@gamehub.com", "vendedor123", "ROLE_VENDEDOR");
         crearCuentaSiNoExiste("operador@gamehub.com", "op123", "ROLE_OPERADOR");
         crearCuentaSiNoExiste("cliente@gmail.com", "cliente123", "ROLE_CLIENTE");
     }
